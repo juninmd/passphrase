@@ -1,0 +1,24 @@
+[package]
+name = "passphrase"
+version = "1.0.0"
+edition = "2021"
+description = "Generate strong diceware passphrases and random passwords, with an honest entropy report."
+license = "MIT"
+repository = "https://github.com/juninmd/passphrase"
+
+[[bin]]
+name = "passphrase"
+path = "src/main.rs"
+
+[lib]
+name = "passphrase"
+path = "src/lib.rs"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+rand = "0.8"
+
+[profile.release]
+strip = true
+opt-level = "z"
+lto = true
