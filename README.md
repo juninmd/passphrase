@@ -9,12 +9,14 @@ passphrase pass -l 24             # 24-char password (upper+digits+symbols)
 passphrase pass -l 32 --no-symbols
 ```
 
+`pass` flags: `-l/--len` (1..=1024), `--no-upper`, `--no-digits`, `--no-symbols` (lowercase is always included). `words` takes `-c/--count` (1..=64), `-s/--sep`, `-C/--capitalize`.
+
 The secret is printed to **stdout**; the entropy line goes to **stderr**, so `passphrase | pbcopy` copies only the secret.
 
 ```
 $ passphrase words -c 6
 grid-fuel-oath-lamp-vine-dusk
-  ~50 bits of entropy (reasonable)
+  ~48 bits of entropy (reasonable)
 ```
 
 ## Why entropy matters

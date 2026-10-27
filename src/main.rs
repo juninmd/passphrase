@@ -15,9 +15,9 @@ struct Cli {
 enum Cmd {
     /// Diceware-style passphrase (default)
     Words {
-        /// number of words
-        #[arg(short, long, default_value_t = 6)]
-        count: usize,
+        /// number of words (1..=64)
+        #[arg(short, long, default_value_t = 6, value_parser = clap::value_parser!(u32).range(1..=64))]
+        count: u32,
         /// word separator
         #[arg(short, long, default_value = "-")]
         sep: String,
@@ -27,18 +27,18 @@ enum Cmd {
     },
     /// Random character password
     Pass {
-        /// password length
-        #[arg(short, long, default_value_t = 20)]
-        len: usize,
-        /// include uppercase
-        #[arg(short = 'U', long, default_value_t = true)]
-        upper: bool,
-        /// include digits
-        #[arg(short = 'D', long, default_value_t = true)]
-        digits: bool,
-        /// include symbols
-        #[arg(short = 'S', long, default_value_t = true)]
-        symbols: bool,
+        /// password length (1..=1024)
+        #[arg(short, long, default_value_t = 20, value_parser = clap::value_parser!(u32).range(1..=1024))]
+        len: u32,
+        /// exclude uppercase letters
+        #[arg(long)]
+        no_upper: bool,
+        /// exclude digits
+        #[arg(long)]
+        no_digits: bool,
+        /// exclude symbols
+        #[arg(long)]
+        no_symbols: bool,
     },
 }
 
@@ -53,11 +53,13 @@ fn main() {
 
     match cli.command.unwrap_or(Cmd::Words { count: 6, sep: "-".into(), capitalize: false }) {
         Cmd::Words { count, sep, capitalize } => {
+            let count = count as usize;
             let phrase = passphrase(&mut rng, count, &sep, capitalize);
             report(&phrase, entropy_bits(WORDS.len(), count));
         }
-        Cmd::Pass { len, upper, digits, symbols } => {
-            let pool = charset(upper, digits, symbols);
+        Cmd::Pass { len, no_upper, no_digits, no_symbols } => {
+            let len = len as usize;
+            let pool = charset(!no_upper, !no_digits, !no_symbols);
             let pw = password(&mut rng, len, &pool);
             report(&pw, entropy_bits(pool.chars().count(), len));
         }
